@@ -12,23 +12,29 @@ import datetime
 
 def image_analysis(image):
     # 色基準で2値化する。
-    image = cv2.imread(image)
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+
     #デバッグ用
-    cv2.imwrite('output_shapes.png',image)
+    cv2.imwrite('output_shapes1.png',image)
 
-    lower_color = np.array([0, 0, 0])
-    upper_color = np.array([179, 128, 100])
+    # 閾値の設定
+    threshold = 100
 
-    # 指定した色に基づいたマスク画像の生成
-    mask = cv2.inRange(hsv, lower_color, upper_color)
-    edges = cv2.Canny(mask,50,200)
+    # 二値化(閾値100を超えた画素を255にする。)
+    ret, img_thresh = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY_INV)
+
     #デバッグ用
-    cv2.imwrite('output_shapes2.png',edges)
-    contours, hierarchy= cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    cv2.imwrite('output_shapes2.png',img_thresh)
 
+    contours, hierarchy= cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    
     count_objects_image = len(contours)
 
     print("画像内のオブジェクト数：",str(count_objects_image))
+
+    cv2.drawContours(img_thresh, contours, -1, (0,0,255), 2) 
+    cv2.imshow("contours",img_thresh) #別ウィンドウを開き(ウィンドウ名 "contours")オブジェクトimg_colorを表示
+    cv2.waitKey(0) #キー入力待ち
+    cv2.destroyAllWindows() #ウインドウを閉じる
 
 image_analysis("test.jpg")
