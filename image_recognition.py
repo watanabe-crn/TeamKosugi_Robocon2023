@@ -26,15 +26,9 @@ def image_analysis(image):
     #デバッグ用
     cv2.imwrite('output_shapes2.png',img_thresh)
 
-    contours, hierarchy= cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
+    contours, hierarchy= cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)    
     count_objects_image = len(contours)
 
     print("画像内のオブジェクト数：",str(count_objects_image))
-
-    cv2.drawContours(img_thresh, contours, -1, (0,0,255), 2) 
-    cv2.imshow("contours",img_thresh) #別ウィンドウを開き(ウィンドウ名 "contours")オブジェクトimg_colorを表示
-    cv2.waitKey(0) #キー入力待ち
-    cv2.destroyAllWindows() #ウインドウを閉じる
 
 image_analysis("test.jpg")
