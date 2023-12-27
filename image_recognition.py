@@ -23,7 +23,7 @@ def image_analysis(image):
     # 二値化(閾値100を超えた画素を255にする。)
     ret, img_thresh = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY_INV)
 
-    #デバッグ用
+    #デバッグ用 
     cv2.imwrite('output_shapes2.png',img_thresh)
 
     contours, hierarchy= cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)    
