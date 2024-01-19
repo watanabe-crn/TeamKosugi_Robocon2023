@@ -32,3 +32,4 @@ def movenext():
 #このスクリプトが直接実行されたときだけ処理を行う
 if __name__ == '__main__':
     movenext()
+    
