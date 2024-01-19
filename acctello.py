@@ -100,7 +100,7 @@ class AccTello:
         self.frame_read.stop
         self.q_stop.put(True)
 
-    def savePic(self, no):
+    def ooesavePic(self, no):
         # 画像保存
         for i in range(PIC_CNT):
             dt = datetime.datetime.now()
