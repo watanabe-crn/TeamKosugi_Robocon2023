@@ -16,6 +16,8 @@ def main():
     #メイン処理
     acc.startGame()
     time.sleep(20)
+    
+    acc.move()
 
     acc.endGame()
 

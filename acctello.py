@@ -7,6 +7,8 @@ import threading
 import queue
 import datetime
 
+import move
+
 # 定数
 PIC_CNT = 3     #１回あたりの写真保存枚数
 PIC_INT = 0.1   #画像保存感覚（秒）
@@ -31,6 +33,7 @@ class AccTello:
         self.yVal = 0   #現在位置（縦）
         self.zVal = 0   #現在位置（高さ）
         self.aVal = 0   #現在位置（角度）
+        self.zahyo = [10, 10, self.zVal, self.aVal]    #現在位置（xyz座標）と角度
 
         #画像転送が安定するまで少し待つ
         time.sleep(1)
@@ -86,6 +89,21 @@ class AccTello:
 #        self.tello.takeoff()   #離陸
         self.zVal = self.tello.get_height()    #現在位置（高さ）に高度設定
         print('高さ = {}cm'.format(self.tello.get_height()))
+
+    def move(self):
+        # 現在地(座標)
+        print('現在の座標と角度です' + str(self.zahyo))
+        # 目的の座標
+        next_zahyo = [11,11,8,0]
+        # 移動先を指定し、新たな座標を取得します
+        # 第一引数：移動先座標　 第二引数：現在の座標
+        new_zahyo = move.movenext(next_zahyo, self.zahyo)
+
+        print('新しい座標と角度です' + str(new_zahyo))
+
+        # 移動後の現在地（座標）を求めます
+        self.zahyo = new_zahyo
+        print('現在の座標と角度を更新しました' + str(self.zahyo))
     
     def endGame(self):
         #ゲーム終了

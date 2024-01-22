@@ -4,32 +4,37 @@ from djitellopy import Tello
 # 定数
 tello = Tello()
 
-def movenext():
+def movenext(next_zahyo_list, current_zahyo_list):
+    print('movenextメソッドを開始します。')
+    print('呼び出し元から渡された移動先座標：' + str(next_zahyo_list))
+    # リストで受け取った移動先座標の値をそれぞれ変数に代入します
+    dst_x = next_zahyo_list[0]
+    dst_y = next_zahyo_list[1]
+    dst_z = next_zahyo_list[2]
+    dst_a = next_zahyo_list[3]
 
-#フィールドサイズ
-    XY_SIZE = 900   #フィールドの縦横のサイズ（cm）
-    Z_SIZE  = 400   #フィールドの高さのサイズ（cm）
+    # リストで受け取った現在の座標の値をそれぞれ変数に代入します
+    crt_x = current_zahyo_list[0]
+    crt_y = current_zahyo_list[1]
+    crt_z = current_zahyo_list[2]
+    crt_a = current_zahyo_list[3]
+    # 移動スピード指定（s/cm）
+    speed = 20
+    # 座標一マスあたりの距離(cm)
+    zahyo_cm = 50
 
-#開始位置
+    #現在の座標と目的の座標を比べ、移動距離を計算します
+    x_cm = zahyo_cm * (dst_x - crt_x)
+    y_cm = zahyo_cm * (dst_y - crt_y)
+    z_cm = zahyo_cm * (dst_z - crt_z)
     
-    xVal = 0   #現在位置（横）
-    yVal = 0   #現在位置（縦）
-    zVal = 0   #現在位置（高さ）
-    aVal = 0   #現在位置（角度）
+    print('移動先までの距離(cm)と角度：' + str(x_cm) + ',' + str(y_cm) + ',' + str(z_cm) + ',' + str(dst_a) )
+    print('移動開始')
+    tello.go_xyz_speed(x_cm, y_cm, z_cm, speed)
+    print('移動終了')
 
-#移動先の風船のXY座標
-    #左下1,1・左上1,19・右上19,19・右下19,1
-    #座標0と20はフィールド外
-    balloon1 = (1,1)
-    balloon2 = (1,19)
-    balloon3 = (19,1)
-    balloon4 = (19,19)
+    new_zahyo = [dst_x, dst_y, dst_z, dst_a]
 
-    tello.go_xyz_speed(1, 1, 10, 20)
-    tello.rotate_clockwise(90)
-    tello.rotate_counter_clockwise(90)
-
-#このスクリプトが直接実行されたときだけ処理を行う
-if __name__ == '__main__':
-    movenext()
-    
+    return new_zahyo
+  
+# if __name__ == '__main__':  
