@@ -92,15 +92,10 @@ def get_next_balloon_no(i, bal_no, card_no):
                 return bal_no[0] + 1
     elif i==2:
         # 三つ目の場合、まだ確認していない風船のうち番号の小さい風船を設定
-        if 1 not in bal_no:
-            return 1
-        elif 2 not in bal_no:
-            return 2
-        elif 3 not in bal_no:
-            return 3
-        elif 4 not in bal_no:
-            return 4
-        
+        for i in range(4):
+            if i not in bal_no:
+                return i
+
 
 
 
