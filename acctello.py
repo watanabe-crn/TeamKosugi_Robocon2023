@@ -33,7 +33,7 @@ class AccTello:
         self.yVal = 0   #現在位置（縦）
         self.zVal = 0   #現在位置（高さ）
         self.aVal = 0   #現在位置（角度）
-        self.zahyo = [10, 10, self.zVal, self.aVal]    #現在位置（xyz座標）と角度
+        self.zahyo = [self.xVal, self.yVal, self.zVal, self.aVal]    #現在位置（xyz座標）と角度
 
         #画像転送が安定するまで少し待つ
         time.sleep(1)
@@ -90,7 +90,7 @@ class AccTello:
         self.zVal = self.tello.get_height()    #現在位置（高さ）に高度設定
         print('高さ = {}cm'.format(self.tello.get_height()))
 
-    def move(self):
+    def move(self,bal):
         # 現在地(座標)
         print('現在の座標と角度です' + str(self.zahyo))
         # 目的の座標
@@ -104,13 +104,29 @@ class AccTello:
         # 移動後の現在地（座標）を求めます
         self.zahyo = new_zahyo
         print('現在の座標と角度を更新しました' + str(self.zahyo))
+
+        # 風船の高さが不明の場合は高さを確認
+
+        # 高さを確認したら高さを風船クラスに設定
+
     
+    def conf_card(self, bal, took_photo_no):
+        # カードを解析して番号を取得
+
+        # カード番号が撮影済みカード番号の次の番号だったら撮影
+    
+        # リターン（カード番号、撮影済（Bool）
+        ret = (1, True)
+        return ret
+
     def endGame(self):
-        #ゲーム終了
+        # ゲーム終了
+        # 開始位置に移動
+        
 #        self.tello.land()   #着陸
         self.zVal = self.tello.get_height()    #現在位置（高さ）に高度設定
         print('高さ = {}cm'.format(self.tello.get_height()))
-        self.savePic(5)   #終了時間撮影
+        self.savePic(6)   #終了時間撮影
 
         #終了処理
         self.tello.set_video_direction(Tello.CAMERA_DOWNWARD)
