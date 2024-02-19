@@ -22,10 +22,10 @@ def main():
     acc.showCamera()
 
     # 風船
-    bal_1 = Ballon(-9,9)
-    bal_2 = Ballon(9,9)
-    bal_3 = Ballon(9,-9)
-    bal_4 = Ballon(-9,-9)
+    bal_1 = Ballon(1,19)
+    bal_2 = Ballon(19,19)
+    bal_3 = Ballon(19,1)
+    bal_4 = Ballon(1,1)
     bal = [bal_1,bal_2,bal_3,bal_4]
 
     # 撮影済みカード番号（最大値）
@@ -57,6 +57,9 @@ def main():
         # 風船番号、カード番号
         bal_no.append(next_baloon_no)
         card_no.append(ret[0])
+
+    # 四つ目の風船（残った一つ）の情報を設定
+        
 
     # 未撮影のカード撮影
     for i in range(4 - took_photo_no):
