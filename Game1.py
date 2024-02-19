@@ -22,10 +22,10 @@ def main():
     acc.showCamera()
 
     # 風船
-    bal_1 = Ballon(1,19)
-    bal_2 = Ballon(19,19)
-    bal_3 = Ballon(19,1)
-    bal_4 = Ballon(1,1)
+    bal_1 = Ballon(1,19,135)
+    bal_2 = Ballon(19,19,225)
+    bal_3 = Ballon(19,1,325)
+    bal_4 = Ballon(1,1,45)
     bal = [bal_1,bal_2,bal_3,bal_4]
 
     # 撮影済みカード番号（最大値）
