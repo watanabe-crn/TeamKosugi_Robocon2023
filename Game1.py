@@ -22,10 +22,10 @@ def main():
     acc.showCamera()
 
     # 風船
-    bal_1 = Ballon(1,19,135)
-    bal_2 = Ballon(19,19,225)
-    bal_3 = Ballon(19,1,325)
-    bal_4 = Ballon(1,1,45)
+    bal_1 = Ballon(1, 1, 19, 135)
+    bal_2 = Ballon(2, 19, 19, 225)
+    bal_3 = Ballon(3, 19, 1, 325)
+    bal_4 = Ballon(4, 1, 1, 45)
     bal = [bal_1,bal_2,bal_3,bal_4]
 
     # 撮影済みカード番号（最大値）
@@ -41,9 +41,11 @@ def main():
     # カード確認
     bal_no = []
     card_no = []
+    recent_card_no = 0
+
     for i in range(3):
         # 移動先の風船番号を取得
-        next_baloon_no = get_next_balloon_no(i, next_baloon_no)
+        next_baloon_no = get_next_balloon_no(i, next_baloon_no,recent_card_no)
 
         # 取得した番号の風船に移動
         acc.move(bal(next_baloon_no))
@@ -57,17 +59,21 @@ def main():
         # 風船番号、カード番号
         bal_no.append(next_baloon_no)
         card_no.append(ret[0])
-
-    # 四つ目の風船（残った一つ）の情報を設定
-    get_next_balloon_no(3, next_baloon_no)
+        recent_card_no = ret[0]
+    else:
+        # 四つ目の風船（残った一つ）の情報を設定
+        for j in range(3):
+            if j not in card_no:
+                break
+        card[j-1] = bal(get_next_balloon_no(3, next_baloon_no,recent_card_no)) # カード番号のリストを更新
 
     # 未撮影のカード撮影
     for i in range(4 - took_photo_no):
         # 未撮影の風船に移動
-        acc.move(bal(took_photo_no + 1))
+        acc.move(card(took_photo_no))
         # 撮影
-        acc.savePic(took_photo_no + 1)
-        took_photo_no = took_photo_no + 1
+        ret = acc.conf_card(card(took_photo_no), took_photo_no)
+        took_photo_no = ret[0]  # 撮影済みカード番号を更新
 
     # 終了
     acc.endGame()
@@ -94,7 +100,7 @@ def get_next_balloon_no(i, bal_no, card_no):
             else:
                 return bal_no[0] + 1
     elif i==2 or i==3:
-        # 三つ目の場合、まだ確認していない風船のうち番号の小さい風船を設定
+        # 三つ目または四つ目の場合、まだ確認していない風船のうち番号の小さい風船を設定
         for j in range(4):
             if j not in bal_no:
                 return j

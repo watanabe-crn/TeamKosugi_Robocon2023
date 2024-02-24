@@ -86,7 +86,7 @@ class AccTello:
     def startGame(self):
         #ゲーム開始
         self.savePic(1)   #開始時間撮影
-#        self.tello.takeoff()   #離陸
+        self.tello.takeoff()   #離陸
         self.zVal = self.tello.get_height()    #現在位置（高さ）に高度設定
         print('高さ = {}cm'.format(self.tello.get_height()))
 
@@ -104,10 +104,6 @@ class AccTello:
         # 移動後の現在地（座標）を求めます
         self.zahyo = new_zahyo
         print('現在の座標と角度を更新しました' + str(self.zahyo))
-
-        # 風船の高さが不明の場合は高さを確認
-
-        # 高さを確認したら高さを風船クラスに設定
 
     
     def conf_card(self, bal, took_photo_no):
