@@ -106,15 +106,24 @@ class AccTello:
         print('現在の座標と角度を更新しました' + str(self.zahyo))
 
         # 風船の高さが不明の場合は高さを確認
-
+        image = self.frame_read.frame
+        dot_count = self.image_analysis(image)
+        while dot_count >=1 and dot_count <= 4:
+            height = Tello.get_height()
+        else:
+            Tello.move_up(30)
+            image = self.frame_read.frame
+            dot_count = self.image_analysis(image)
         # 高さを確認したら高さを風船クラスに設定
-
+        
     
     def conf_card(self, bal, took_photo_no):
         # カードを解析して番号を取得
-
+        image = self.frame_read.frame
+        count = self.image_analysis(image)
         # カード番号が撮影済みカード番号の次の番号だったら撮影
-    
+        if count == took_photo_no + 1:
+            self.savePic
         # リターン（カード番号、撮影済（Bool）
         ret = (1, True)
         return ret
@@ -142,4 +151,30 @@ class AccTello:
             cv2.imwrite(fn, self.frame_read.frame) #画像保存
             time.sleep(PIC_INT) #指定秒数待機
 
+    def image_analysis(image):
+        # 色基準で2値化する。
+        image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
 
+        # 閾値の設定
+        threshold = 100
+
+        # 二値化(閾値を超えた画素を255にする。)
+        ret, img_thresh = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY_INV)
+
+        contours, hierarchy= cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        #特定の面積以外のノイズ除去 ここの数字を適切な値にする
+        cv2.drawContours(img_thresh,[i for i in contours if abs(cv2.contourArea(i))<= 750 or abs(cv2.contourArea(i))> 1500], -1,(0,0,0),-1)
+
+        #デバッグ用
+        #cv2.imwrite('output_shapes1.png',img_thresh)
+
+        #第一引数で輝度で平均化処理する。
+        #第二引数は平均化するピクセル数で30x30ピクセル
+        img_thresh = cv2.blur(img_thresh,(30,30))
+
+        contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) #輪郭抽出
+
+        count_objects_image = len(contours)
+
+        return count_objects_image
