@@ -16,7 +16,7 @@ PIC_INT = 0.1   #画像保存感覚（秒）
 XY_SIZE = 900   #フィールドの縦横のサイズ（cm）
 Z_SIZE = 900    #フィールドの高さのサイズ（cm）
 speed = 1   # 移動スピード指定（s/cm）
-zahyo_cm = 2   # 座標一マスあたりの距離(cm)
+zahyo_cm = 50   # 座標一マスあたりの距離(cm)
 
 class AccTello:
     """Telloアクセス用クラス"""
