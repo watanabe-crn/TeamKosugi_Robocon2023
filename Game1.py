@@ -24,7 +24,7 @@ def main():
     # 風船
     bal_1 = Ballon(1, 1, 19, 135)
     bal_2 = Ballon(2, 19, 19, 225)
-    bal_3 = Ballon(3, 19, 1, 325)
+    bal_3 = Ballon(3, 19, 1, 315)
     bal_4 = Ballon(4, 1, 1, 45)
     bal = [bal_1,bal_2,bal_3,bal_4]
 
@@ -48,11 +48,15 @@ def main():
         next_baloon_no = get_next_balloon_no(i, next_baloon_no,recent_card_no)
 
         # 取得した番号の風船に移動
-        acc.move(bal(next_baloon_no))
+        next_baloon_no = i
+        if i==0:
+            acc.startMove(bal[next_baloon_no])
+        else:
+            acc.move(bal[next_baloon_no])
 
         # 風船のカード確認
-        ret = acc.conf_card(bal(next_baloon_no), took_photo_no)
-        card[ret[0] - 1] = bal(next_baloon_no) # カード番号のリストを更新
+        ret = acc.conf_card(bal[next_baloon_no], took_photo_no)
+        card[ret[0] - 1] = bal[next_baloon_no] # カード番号のリストを更新
         if ret[1]:
             took_photo_no = ret[0]  # 撮影した場合は撮影済みカード番号を更新
         
