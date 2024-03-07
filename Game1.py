@@ -48,7 +48,7 @@ def main():
         next_baloon_no = get_next_balloon_no(i, next_baloon_no,recent_card_no)
 
         # 取得した番号の風船に移動
-        next_baloon_no = i
+        next_baloon_no = i # 上記の移動先風船番号取得メソッドが使えない為、暫定対応です(3/8)
         if i==0:
             acc.startMove(bal[next_baloon_no])
         else:
