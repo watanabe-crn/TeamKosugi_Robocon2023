@@ -72,9 +72,6 @@ def main():
     # 終了
     acc.endGame()
 
-if __name__ == "__main__":
-    main()
-
 def get_next_balloon_no(i, bal_no, card_no):
     if i==0:
         # 一つ目の場合、ランダムで設定
@@ -99,6 +96,8 @@ def get_next_balloon_no(i, bal_no, card_no):
             if j not in bal_no:
                 return j
 
+if __name__ == "__main__":
+    main()
 
 
 
