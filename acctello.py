@@ -194,13 +194,21 @@ class AccTello:
          # 風船の高さが不明の場合は高さを確認
         image = self.frame_read.frame
         dot_count = self.image_analysis(image)
-        while dot_count >=1 and dot_count <= 4:
-            height = Tello.get_height()
-        else:
-            Tello.move_up(30)
-            image = self.frame_read.frame
-            dot_count = self.image_analysis(image)
-                  
+        if self.zVal >= 90 and self.zVal <= 110:
+            while dot_count >=1 and dot_count <= 4:
+                self.zVal = Tello.get_height()
+            else:
+                Tello.move_up(30)
+                image = self.frame_read.frame
+                dot_count = self.image_analysis(image)
+        elif self.zVal >= 390 and self.zVal <= 410 :
+            while dot_count >=1 and dot_count <= 4:
+                self.zVal = Tello.get_height()
+            else:
+                Tello.move_down(30)
+                image = self.frame_read.frame
+                dot_count = self.image_analysis(image)
+
     def setCurrentZahyo(self,zahyo):
         # リストで受け取った移動先座標の値をそれぞれ変数に代入します
         self.xVal = zahyo[0]
@@ -237,8 +245,10 @@ class AccTello:
         # カード番号が撮影済みカード番号の次の番号だったら撮影
         if count == took_photo_no + 1:
             self.savePic
-        # リターン（カード番号、撮影済（Bool）
-        ret = (1, True)
+            # リターン（カード番号、撮影済（Bool）
+            ret = (count, True)
+        else:
+            ret = (count, False)
         return ret
 
     def endGame(self):
