@@ -22,13 +22,14 @@ def main():
     acc.showCamera()
 
     # 風船
-    bal_1 = Ballon(1,19,135)
-    bal_2 = Ballon(19,19,225)
-    bal_3 = Ballon(19,1,325)
-    bal_4 = Ballon(1,1,45)
+    bal_1 = Ballon(1,1,19,135)
+    bal_2 = Ballon(2,19,19,225)
+    bal_3 = Ballon(3,19,1,315)
+    bal_4 = Ballon(4,1,1,45)
     bal = [bal_1,bal_2,bal_3,bal_4]
 
     # 撮影済みカード番号（最大値）
+    next_baloon_no = 0
     took_photo_no = 0
 
     # カード番号に対する風船
@@ -43,10 +44,10 @@ def main():
     card_no = []
     for i in range(3):
         # 移動先の風船番号を取得
-        next_baloon_no = get_next_balloon_no(i, next_baloon_no)
+        next_baloon_no = get_next_balloon_no(i, next_baloon_no, took_photo_no)
 
         # 取得した番号の風船に移動
-        acc.move(bal(next_baloon_no))
+        acc.move(bal[next_baloon_no])
 
         # 風船のカード確認
         ret = acc.conf_card(bal(next_baloon_no), took_photo_no)
@@ -75,7 +76,7 @@ def main():
 def get_next_balloon_no(i, bal_no, card_no):
     if i==0:
         # 一つ目の場合、ランダムで設定
-        return random.randint(1,4)
+        return random.randint(0,3)
     elif i==1:
         # 二つ目の場合、一つ目のカード番号により分岐
         if card_no[0] < 3:
@@ -98,10 +99,3 @@ def get_next_balloon_no(i, bal_no, card_no):
 
 if __name__ == "__main__":
     main()
-
-
-
-
-        
-
-

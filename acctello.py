@@ -16,7 +16,8 @@ PIC_INT = 0.1   #画像保存感覚（秒）
 XY_SIZE = 900   #フィールドの縦横のサイズ（cm）
 Z_SIZE = 900    #フィールドの高さのサイズ（cm）
 speed = 100   # 移動スピード指定（s/cm） # 100がgo_xyz_speedコマンドのMax値
-zahyo_cm = 10   # 座標一マスあたりの距離(cm)
+rowSpeed = int(speed * 0.5)
+zahyo_cm = 1   # 座標一マスあたりの距離(cm)
 
 class AccTello:
     """Telloアクセス用クラス"""
@@ -89,7 +90,7 @@ class AccTello:
     def startGame(self):
         #ゲーム開始
         self.savePic(1)   #開始時間撮影
-        #self.tello.takeoff()   #離陸
+        self.tello.takeoff()   #離陸
         self.xVal=10
         self.yVal=10
         self.zVal = self.tello.get_height()    #現在位置（高さ）に高度設定
@@ -97,6 +98,7 @@ class AccTello:
         self.aVal=0
 
     def move(self,bal):
+        self.next_zVal=Ballon.get_z(bal)
         # 高さを取得値か最低か最高に設定
         # 一つ目の風船の場合、最も低い位置へ移動
         if self.xVal == 10:
@@ -105,7 +107,7 @@ class AccTello:
             elif self.zVal > 110:
                 self.tello.move_down(self.zVal - 90)
             if self.next_zVal != 0:
-                self.tello.go_xyz_speed(0,0, self.zVal-self.next_zVal, speed * 0.5)
+                self.tello.go_xyz_speed(0,0, self.zVal-self.next_zVal, rowSpeed)
             elif self.zVal > 250:
                 if self.zVal < 400:
                     self.tello.move_up(400 - self.zVal)
@@ -139,11 +141,20 @@ class AccTello:
             if self.xVal != 10:
                 # 自風船の内側へ移動
                 #?#どうやって自風船の内側を求めるか
-                next_zahyo = Ballon(bal).get_take_photo_position
+                # ballon_innerPos = Ballon(bal).get_inner_position
+                # if ballon_innerPos[0] == ballon_innerPos[1]:
+                #     if ballon_innerPos[0] > 10:
+                #         curve_xVal=
+                next_zahyo = Ballon(self.myBal).get_inner_position
                 self.setNextZahyo(next_zahyo)
                 distance = self.calcDistance(self)
                 #?# カーブの経路を指定しなければいけないが、4パターン分岐がある
-                self.tello.curve_xyz_speed(distance[0],distance[1],0,speed * 0.5)
+                curve_point=Ballon(self.myBal).get_curve_point
+                curve_xVal=curve_point[0]
+                curve_yVal=curve_point[1]
+                curve_xDistance = zahyo_cm * (curve_yVal- self.yVal)
+                curve_yDistance = zahyo_cm * (curve_xVal - self.xVal)
+                self.tello.curve_xyz_speed(curve_xDistance,curve_yDistance,0,distance[0],distance[1],0,rowSpeed)
                 self.setCurrentZahyo(next_zahyo)
             # 次の風船の内側へ移動
             next_zahyo = Ballon(bal).get_inner_position
@@ -158,20 +169,16 @@ class AccTello:
             self.setNextZahyo(next_zahyo)
             distance = self.calcDistance(self)
             #?# カーブの経路を指定しなければいけないが、4パターン分岐がある
-            self.tello.curve_xyz_speed(distance[0],distance[1],0,speed * 0.5)
+            curve_point=Ballon(bal).get_curve_point
+            curve_xVal=curve_point[0]
+            curve_yVal=curve_point[1]
+            curve_xDistance = zahyo_cm * (curve_yVal- self.yVal)
+            curve_yDistance = zahyo_cm * (curve_xVal - self.xVal)
+            self.tello.curve_xyz_speed(curve_xDistance,curve_yDistance,0,distance[0],distance[1],0,rowSpeed)
             self.setCurrentZahyo(next_zahyo)
         # 風船へ向く
         self.rotate(next_aVal)
         
-        # 風船の高さ調査
-        if self.next_zVal == 0:
-            # for i in range (10):
-            #     if self.zVal < 250:
-            #       self.tello.move_up(20)
-            #     else:
-            #       self.tello.move_down(20)
-            print
-
          # 風船の高さが不明の場合は高さを確認
         image = self.frame_read.frame
         dot_count = self.image_analysis(image)
@@ -191,6 +198,8 @@ class AccTello:
                 Tello.move_down(30)
                 image = self.frame_read.frame
                 dot_count = self.image_analysis(image)
+        # 自風船を変数へ格納（次のループで移動時に必要なため）
+        self.myBal=bal
 
     def setCurrentZahyo(self,zahyo):
         # リストで受け取った移動先座標の値をそれぞれ変数に代入します
@@ -269,29 +278,39 @@ class AccTello:
             cv2.imwrite(fn, self.frame_read.frame) #画像保存
             time.sleep(PIC_INT) #指定秒数待機
 
+
     def image_analysis(image):
         # 色基準で2値化する。
         image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
 
         # 閾値の設定
-        threshold = 100
+        threshold = 10
 
         # 二値化(閾値を超えた画素を255にする。)
         ret, img_thresh = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY_INV)
 
         contours, hierarchy= cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        #特定の面積以外のノイズ除去 ここの数字を適切な値にする
-        cv2.drawContours(img_thresh,[i for i in contours if abs(cv2.contourArea(i))<= 750 or abs(cv2.contourArea(i))> 1500], -1,(0,0,0),-1)
-
         #デバッグ用
         #cv2.imwrite('output_shapes1.png',img_thresh)
 
+        #特定の面積以外のノイズ除去 ここの数字を適切な値にする
+        cv2.drawContours(img_thresh,[i for i in contours if abs(cv2.contourArea(i))<= 130 or abs(cv2.contourArea(i))> 170], -1,(0,0,0),-1)
+
+        #デバッグ用
+        #cv2.imwrite('output_shapes2.png',img_thresh)
+
         #第一引数で輝度で平均化処理する。
         #第二引数は平均化するピクセル数で30x30ピクセル
-        img_thresh = cv2.blur(img_thresh,(30,30))
+        img_thresh = cv2.blur(img_thresh,(3,3))
+
+        #デバッグ用
+        #cv2.imwrite('output_shapes3.png',img_thresh)
 
         contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) #輪郭抽出
+
+        #デバッグ用
+        #cv2.imwrite('output_shapes4.png',img_thresh)
 
         count_objects_image = len(contours)
 
