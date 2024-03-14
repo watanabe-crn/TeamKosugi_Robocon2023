@@ -7,7 +7,7 @@ import threading
 import queue
 import datetime
 
-import move
+
 from ballon import Ballon
 
 # 定数
@@ -15,8 +15,8 @@ PIC_CNT = 3     #１回あたりの写真保存枚数
 PIC_INT = 0.1   #画像保存感覚（秒）
 XY_SIZE = 900   #フィールドの縦横のサイズ（cm）
 Z_SIZE = 900    #フィールドの高さのサイズ（cm）
-speed = 1   # 移動スピード指定（s/cm）
-zahyo_cm = 2   # 座標一マスあたりの距離(cm)
+speed = 100   # 移動スピード指定（s/cm） # 100がgo_xyz_speedコマンドのMax値
+zahyo_cm = 10   # 座標一マスあたりの距離(cm)
 
 class AccTello:
     """Telloアクセス用クラス"""
@@ -32,8 +32,8 @@ class AccTello:
         self.camera_dir = Tello.CAMERA_FORWARD
         self.q_stop = queue.Queue()
 
-        self.xVal = 0   #現在位置（横）
-        self.yVal = 0   #現在位置（縦）
+        self.xVal = 10   #現在位置（横）
+        self.yVal = 10   #現在位置（縦）
         self.zVal = 0   #現在位置（高さ）
         self.aVal = 0   #現在位置（角度）
         self.zahyo = [self.xVal, self.yVal, self.zVal, self.aVal]    #現在位置（xyz座標）と角度
@@ -96,91 +96,72 @@ class AccTello:
         print('高さ = {}cm'.format(self.tello.get_height()))
         self.aVal=0
 
-    def startMove(self,bal):
-        # 移動先座標[x,y]・角度を取得し、変数にセット
-        next_zahyo = Ballon.get_inner_position(bal)
-        self.next_aVal = Ballon.get_r(bal)
-        self.setNextZahyo(next_zahyo)
-        # 移動距離計算
-        distance = self.calcDistance()
-        # 風船の内側へ移動
-        #self.tello.go_xyz_speed(distance[0],distance[1],0,100)
-        # 現在地として座標を設定
-        self.setCurrentZahyo(next_zahyo)
-        # 風船の外側へ移動
-        #next_zahyo = Ballon.get_take_photo_position(bal)
-        self.setNextZahyo(next_zahyo)
-        distance = self.calcDistance()
-        #self.tello.go_xyz_speed(distance[0],distance[1],0,50)
-        self.setCurrentZahyo(next_zahyo)
-        # 高さ設定
-        # if self.zVal < 80:
-        #     self.tello.move_up(100 - self.zVal)
-        # elif self.zVal > 110:
-        #     self.tello.move_down(self.zVal - 90)
-        self.zVal = self.tello.get_height()    #現在位置（高さ）に高度設定
-
-        # 風船に向かい回転
-        #self.rotate(self)
-        # 風船の高さ調査
-        # for i in range (10):
-        #     self.tello.move_up(20)
-        
-
     def move(self,bal):
         # 高さを取得値か最低か最高に設定
-        if self.next_zVal != 0:
-            self.tello.go_xyz_speed(0,0, self.zVal-self.next_zVal, 30)
-        elif self.zVal > 250:
-            if self.zVal < 400:
-                self.tello.move_up(400 - self.zVal)
-            else:
-                self.tello.move_down(self.zVal - 400)
-        else:
-            if self.zVal < 100:
+        # 一つ目の風船の場合、最も低い位置へ移動
+        if self.xVal == 10:
+            if self.zVal < 80:
                 self.tello.move_up(100 - self.zVal)
+            elif self.zVal > 110:
+                self.tello.move_down(self.zVal - 90)
+            if self.next_zVal != 0:
+                self.tello.go_xyz_speed(0,0, self.zVal-self.next_zVal, speed * 0.5)
+            elif self.zVal > 250:
+                if self.zVal < 400:
+                    self.tello.move_up(400 - self.zVal)
+                else:
+                    self.tello.move_down(self.zVal - 400)
             else:
-                self.tello.move_down(self.zVal - 100)
+                if self.zVal < 100:
+                    self.tello.move_up(100 - self.zVal)
+                else:
+                    self.tello.move_down(self.zVal - 100)
         self.zVal = self.tello.get_height()    #現在位置（高さ）に高度設定
         # 正面へ回転
-        if self.next_aVal < 180:
-            self.tello.rotate_counter_clockwise(self.next_aVal)
-        else:
-            self.tello.rotate_clockwise(360 - self.next_aVal)
-        self.aVal = self.next_aVal  # 現在位置（角度）を設定
+        self.rotateFront()
         # 撮影位置へ移動
         # 移動先座標[x,y]・角度を取得し、変数にセット
-        next_zahyo = Ballon(bal).get_take_photo_position
-        self.next_aVal = Ballon(bal).get_r
+        next_zahyo = Ballon.get_take_photo_position(bal)
+        next_aVal = Ballon.get_r(bal)
         self.setNextZahyo(next_zahyo)
         # 隣り合う風船の場合、撮影場所へ移動
-        if self.xVal == self.next_xVal:
+        if self.xVal == self.next_xVal or self.yVal == self.next_yVal:
             distance = self.calcDistance(self)
-            self.tello.go_xyz_speed(distance[0],distance[1],0,100)
+            self.tello.go_xyz_speed(distance[0],distance[1],0,speed)
             self.setCurrentZahyo(next_zahyo)
-        elif self.yVal == self.next_yVal:
-            distance = self.calcDistance(self)
-            self.tello.go_xyz_speed(distance[0],distance[1],0,100)
-            self.setCurrentZahyo(next_zahyo)
-        # 体格の風船の場合、以下の順に移動
-        # ①風船の内側
-        # ②撮影位置
+        # 対角の風船の場合、以下の順に移動
+        # ①自風船の内側
+        # ②次の風船の内側
+        # ③撮影位置
+        
         else:
+            #1つ目の風船ではない場合
+            if self.xVal != 10:
+                # 自風船の内側へ移動
+                #?#どうやって自風船の内側を求めるか
+                next_zahyo = Ballon(bal).get_take_photo_position
+                self.setNextZahyo(next_zahyo)
+                distance = self.calcDistance(self)
+                #?# カーブの経路を指定しなければいけないが、4パターン分岐がある
+                self.tello.curve_xyz_speed(distance[0],distance[1],0,speed * 0.5)
+                self.setCurrentZahyo(next_zahyo)
+            # 次の風船の内側へ移動
             next_zahyo = Ballon(bal).get_inner_position
+            next_aVal = Ballon.get_r(bal)
             self.setNextZahyo(next_zahyo)
             distance = self.calcDistance(self)
-            # 風船の内側へ移動
-            self.tello.go_xyz_speed(distance[0],distance[1],0,100)
+            self.tello.go_xyz_speed(distance[0],distance[1],0,speed)
             # 現在地として座標を設定
             self.setCurrentZahyo(next_zahyo)
-            # 風船の外側へ移動
+            # 次の風船の外側へ移動
             next_zahyo = Ballon(bal).get_take_photo_position
             self.setNextZahyo(next_zahyo)
             distance = self.calcDistance(self)
-            self.tello.go_xyz_speed(distance[0],distance[1],0,50)
+            #?# カーブの経路を指定しなければいけないが、4パターン分岐がある
+            self.tello.curve_xyz_speed(distance[0],distance[1],0,speed * 0.5)
             self.setCurrentZahyo(next_zahyo)
         # 風船へ向く
-        self.rotate(self)
+        self.rotate(next_aVal)
         
         # 風船の高さ調査
         if self.next_zVal == 0:
@@ -197,6 +178,7 @@ class AccTello:
         if self.zVal >= 90 and self.zVal <= 110:
             while dot_count >=1 and dot_count <= 4:
                 self.zVal = Tello.get_height()
+                Ballon.set_z(self.zVal)
             else:
                 Tello.move_up(30)
                 image = self.frame_read.frame
@@ -204,6 +186,7 @@ class AccTello:
         elif self.zVal >= 390 and self.zVal <= 410 :
             while dot_count >=1 and dot_count <= 4:
                 self.zVal = Tello.get_height()
+                Ballon.set_z(self.zVal)
             else:
                 Tello.move_down(30)
                 image = self.frame_read.frame
@@ -230,14 +213,21 @@ class AccTello:
         ret = [x,y]
         return ret
 
-    def rotate(self):
+    def rotate(self, next_aVal):
         # 風船に向かい回転
-        if self.next_aVal < 180:
-            self.tello.rotate_clockwise(self.next_aVal)
+        if next_aVal < 180:
+            self.tello.rotate_clockwise(next_aVal)
         else:
-            self.tello.rotate_counter_clockwise(360 - self.next_aVal)
-        self.aVal = self.next_aVal  # 現在位置（角度）を設定
+            self.tello.rotate_counter_clockwise(360 - next_aVal)
+        self.aVal = next_aVal  # 現在の角度を設定
     
+    def rotateFront(self):
+        # 正面に向かい回転
+        if self.aVal < 180:
+            self.tello.rotate_counter_clockwise(self.aVal)
+        else:
+            self.tello.rotate_clockwise(360 - self.aVal)
+        self.aVal = 0 # 現在位置（角度）を設定
     def conf_card(self, bal, took_photo_no):
         # カードを解析して番号を取得
         image = self.frame_read.frame
