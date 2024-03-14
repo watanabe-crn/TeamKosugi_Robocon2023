@@ -14,16 +14,40 @@ class Ballon:
         ret = [self.pos_x,self.pos_y,self.pos_z]
         return ret
     
+    def get_inner_position(self):
+        # 風船の内側の座標
+        if self.pos_x < 10:
+            x = self.pos_x + 1
+        else:
+            x = self.pos_x - 1
+        
+        if self.pos_y < 10:
+            y = self.pos_y + 1
+        else:
+            y = self.pos_y - 1
+        ret = [x,y]
+        return ret
+    
     def get_take_photo_position(self):
         # 風船の外側の座標
-        if self.pos_x < 0:
+        if self.pos_x < 10:
             x = self.pos_x - 1
         else:
             x = self.pos_x + 1
         
-        if self.pos_yx < 0:
+        if self.pos_y < 10:
             y = self.pos_y - 1
         else:
+            y = self.pos_y + 1
+        ret = [x,y]
+        return ret
+    
+    def get_curve_point(self):
+        if self.pos_x - self.pos_y > 0:
+            x = self.pos_x - 1
+            y = self.pos_y - 1
+        else:
+            x = self.pos_x + 1
             y = self.pos_y + 1
         ret = [x,y]
         return ret
