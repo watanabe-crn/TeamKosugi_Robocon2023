@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # _*_ coding: utf-8 _*_
 
-from acctello import AccTello
+from acctello_test import AccTello
 from ballon import Ballon
 import time
 import random
@@ -22,10 +22,10 @@ def main():
     acc.showCamera()
 
     # 風船
-    bal_1 = Ballon(1,19,135)
-    bal_2 = Ballon(19,19,225)
-    bal_3 = Ballon(19,1,325)
-    bal_4 = Ballon(1,1,45)
+    bal_1 = Ballon(1, 1,19,135)
+    bal_2 = Ballon(2, 19,19,225)
+    bal_3 = Ballon(3, 19,1,325)
+    bal_4 = Ballon(4, 1,1,45)
     bal = [bal_1,bal_2,bal_3,bal_4]
 
     # 撮影済みカード番号（最大値）
@@ -37,6 +37,8 @@ def main():
     # メイン処理
     # 開始
     acc.startGame()
+
+    acc.move(bal[0])
 
 
     # 終了
