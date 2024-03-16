@@ -10,9 +10,6 @@ import random
 # 1----2
 # |    |
 # 4----3
-
-
-
 def main():
 
     # アクセス用クラス
@@ -44,23 +41,25 @@ def main():
     card_no = []
     for i in range(3):
         # 移動先の風船番号を取得
-        next_baloon_no = get_next_balloon_no(i, next_baloon_no, took_photo_no)
+        next_baloon_no = get_next_balloon_no(i, bal_no, card_no)
+        print(next_baloon_no)
 
         # 取得した番号の風船に移動
         acc.move(bal[next_baloon_no])
 
         # 風船のカード確認
         ret = acc.conf_card(bal(next_baloon_no), took_photo_no)
-        card[ret[0] - 1] = bal(next_baloon_no) # カード番号のリストを更新
+        card[ret[0] - 1] = bal[next_baloon_no] # カード番号のリストを更新
         if ret[1]:
             took_photo_no = ret[0]  # 撮影した場合は撮影済みカード番号を更新
         
         # 風船番号、カード番号
         bal_no.append(next_baloon_no)
         card_no.append(ret[0])
+        # card_no.append(i+1)
 
     # 四つ目の風船（残った一つ）の情報を設定
-    get_next_balloon_no(3, next_baloon_no)
+    card[3] = bal[get_next_balloon_no(3, bal_no, card_no)]
 
     # 未撮影のカード撮影
     for i in range(4 - took_photo_no):
@@ -81,7 +80,7 @@ def get_next_balloon_no(i, bal_no, card_no):
         # 二つ目の場合、一つ目のカード番号により分岐
         if card_no[0] < 3:
             # 対角の風船
-            if bal_no[0] + 2 > 4:
+            if bal_no[0] + 2 > 3:
                 return bal_no[0] - 2
             else:
                 return bal_no[0] + 2
