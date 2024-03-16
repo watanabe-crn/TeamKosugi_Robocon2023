@@ -192,6 +192,25 @@ class AccTello:
         # 自風船を変数へ格納（次のループで移動時に必要なため）
         self.myBal=bal
 
+    def moveStartPos(self):
+        # 正面へ回転
+        self.rotateFront()
+
+        # 自風船の内側へ移動
+        next_zahyo = self.myBal.get_inner_position()
+        self.setNextZahyo(next_zahyo)
+        distance = self.calcDistance()
+        self.tello.go_xyz_speed(distance[0], 0, 0, speed)
+        self.tello.go_xyz_speed(0, distance[1], 0, speed)
+        self.setCurrentZahyo(next_zahyo)
+
+        # 開始位置に移動
+        self.setNextZahyo([10, 10])
+        distance = self.calcDistance()
+        self.tello.go_xyz_speed(distance[0], distance[1], 0, speed)
+        self.setCurrentZahyo([10, 10])
+        self.zVal = self.tello.get_height()    #現在位置（高さ）に高度設定
+       
     def setCurrentZahyo(self,zahyo):
         # リストで受け取った移動先座標の値をそれぞれ変数に代入します
         self.xVal = zahyo[0]
@@ -243,19 +262,14 @@ class AccTello:
 
     def endGame(self):
         # ゲーム終了
-        # 正面へ回転
-        self.tello.rotate_clockwise(10)
+        self.moveStartPos() # 開始位置に移動
+        self.tello.land()   # 着陸
 
-        # 開始位置に移動
-        distance=self.calcDistance
-        self.tello.go_xyz_speed(distance[0],distance[1],0,50)
-        
-#        self.tello.land()   #着陸
-        self.zVal = self.tello.get_height()    #現在位置（高さ）に高度設定
+        self.zVal = self.tello.get_height()    # 現在位置（高さ）に高度設定
         print('高さ = {}cm'.format(self.tello.get_height()))
-        self.savePic(6)   #終了時間撮影
+        self.savePic(6)   # 終了時間撮影
 
-        #終了処理
+        # 終了処理
         self.tello.set_video_direction(Tello.CAMERA_DOWNWARD)
         self.tello.streamoff()
         self.frame_read.stop
