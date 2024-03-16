@@ -48,7 +48,7 @@ def main():
         acc.move(bal[next_baloon_no])
 
         # 風船のカード確認
-        ret = acc.conf_card(bal(next_baloon_no), took_photo_no)
+        ret = acc.conf_card(bal[next_baloon_no], took_photo_no)
         card[ret[0] - 1] = bal[next_baloon_no] # カード番号のリストを更新
         if ret[1]:
             took_photo_no = ret[0]  # 撮影した場合は撮影済みカード番号を更新
@@ -64,7 +64,7 @@ def main():
     # 未撮影のカード撮影
     for i in range(4 - took_photo_no):
         # 未撮影の風船に移動
-        acc.move(bal(took_photo_no + 1))
+        acc.move(bal[took_photo_no + 1])
         # 撮影
         acc.savePic(took_photo_no + 1)
         took_photo_no = took_photo_no + 1
