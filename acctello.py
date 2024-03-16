@@ -286,7 +286,8 @@ class AccTello:
 
     def image_analysis(self, image):
         # 色基準で2値化する。
-        image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+    #    image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         # 閾値の設定
         threshold = 10
