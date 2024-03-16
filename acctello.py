@@ -157,7 +157,7 @@ class AccTello:
             # 次の風船の外側へ移動
             next_zahyo = bal.get_take_photo_position()
             self.setNextZahyo(next_zahyo)
-            distance = self.calcDistance(self)
+            distance = self.calcDistance()
             self.tello.go_xyz_speed(distance[0], 0, 0, speed)
             self.tello.go_xyz_speed(0, distance[1], 0, speed)
             self.setCurrentZahyo(next_zahyo)
@@ -284,7 +284,7 @@ class AccTello:
             time.sleep(PIC_INT) #指定秒数待機
 
 
-    def image_analysis(image):
+    def image_analysis(self, image):
         # 色基準で2値化する。
         image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
 
