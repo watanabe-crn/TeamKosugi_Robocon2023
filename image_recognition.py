@@ -11,6 +11,18 @@ import datetime
 
 
 def image_analysis(image):
+
+    # 拡縮（閾値調整用）
+    scaling = 1
+
+    # ノイズ除去閾値
+    contourArea_min = 750*scaling
+    contourArea_max = 1500*scaling
+
+    # 平均化するピクセル数
+    pixel_a = 30*scaling
+    pixel_b = pixel_a
+
     # 色基準で2値化する。
     image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
 
@@ -23,14 +35,14 @@ def image_analysis(image):
     contours, hierarchy= cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     #特定の面積以外のノイズ除去 ここの数字を適切な値にする
-    cv2.drawContours(img_thresh,[i for i in contours if abs(cv2.contourArea(i))<= 750 or abs(cv2.contourArea(i))> 1500], -1,(0,0,0),-1)
+    cv2.drawContours(img_thresh,[i for i in contours if abs(cv2.contourArea(i))<= contourArea_min or abs(cv2.contourArea(i))> contourArea_max], -1,(0,0,0),-1)
 
     #デバッグ用
     cv2.imwrite('output_shapes1.png',img_thresh)
 
     #第一引数で輝度で平均化処理する。
     #第二引数は平均化するピクセル数で30x30ピクセル
-    img_thresh = cv2.blur(img_thresh,(30,30))
+    img_thresh = cv2.blur(img_thresh,(pixel_a,pixel_b))
 
     contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) #輪郭抽出
 
