@@ -13,15 +13,16 @@ import datetime
 def image_analysis(image):
 
     # 拡縮（閾値調整用）
+    # 30cm:3 50cm:1 100cm:0.3
     scaling = 1
 
     # ノイズ除去閾値
-    contourArea_min = 750*scaling
-    contourArea_max = 1500*scaling
+    contourArea_min = 500*scaling
+    contourArea_max = 1000*scaling
 
-    # 平均化するピクセル数
-    pixel_a = 30*scaling
-    pixel_b = pixel_a
+    ## 平均化するピクセル数
+    #pixel_a = 30
+    #pixel_b = 30
 
     # 色基準で2値化する。
     image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
@@ -42,7 +43,7 @@ def image_analysis(image):
 
     #第一引数で輝度で平均化処理する。
     #第二引数は平均化するピクセル数で30x30ピクセル
-    img_thresh = cv2.blur(img_thresh,(pixel_a,pixel_b))
+#    img_thresh = cv2.blur(img_thresh,(pixel_a,pixel_b))
 
     contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) #輪郭抽出
 
@@ -51,4 +52,4 @@ def image_analysis(image):
     print("画像内のオブジェクト数：",str(count_objects_image))
 #    print("画像内の円の数：",circles)
 
-image_analysis("dot3.png")
+image_analysis("50cm.png")

@@ -7,43 +7,43 @@ import time
 import random
 
 # 風船の番号
-# 1----2
+# 1-----
 # |    |
-# 4----3
+# -----2
+# ※ 1 と 2 はそれぞれ、縦の距離と高さが当日確定します。
+
 
 
 
 def main():
-
-    # アクセス用クラス
+    
     acc = AccTello()
 
-    # カメラ映像表示
-    acc.showCamera()
+    # 識別対象の位置を設定
+    # フィールドの左端からの距離を横、縦で測り入力。単位はcm
 
+    # 1つ目の対象
+    obj1_y = int(300)  # 前後
+    obj1_z = int(100)  # 高さ
+    # 2つ目の対象
+    obj2_y = int(100)  # 前後
+    obj2_z = int(150)  # 高さ
+    
+    
     # 風船
-    bal_1 = Ballon(1, 1,19,135)
-    bal_2 = Ballon(2, 19,19,225)
-    bal_3 = Ballon(3, 19,1,325)
-    bal_4 = Ballon(4, 1,1,45)
-    bal = [bal_1,bal_2,bal_3,bal_4]
+    bal_1 = Ballon(1,50,obj1_y,270,obj1_z)
+    bal_2 = Ballon(2,340,obj2_y,90,obj2_z)
+    bal = [bal_1,bal_2]
 
-    # 撮影済みカード番号（最大値）
-    took_photo_no = 0
-
-    # カード番号に対する風船
-    card = [bal_1, bal_1, bal_1, bal_1]
-
-    # メイン処理
     # 開始
     acc.startGame()
-
-    acc.move(bal[0])
-
-
+    
+    for i in range(len(bal)) :
+        acc.move(bal[i])
+    
     # 終了
     acc.endGame()
-
+    
 if __name__ == "__main__":
     main()
 
