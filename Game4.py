@@ -18,15 +18,15 @@ def main():
     acc.showCamera()
 
     # 風船
-    bal_1 = Ballon(1,1,19,135)
-    bal_2 = Ballon(2,19,19,225)
+    bal_1 = Ballon(1,50,300,270,100) # No,左右,前後,角度,高さ
+    bal_2 = Ballon(2,340,100,90,100) # No,左右,前後,角度,高さ
     bal = [bal_1,bal_2]
 
     # メイン処理
     # 開始
     acc.startGame()
 
-    for i in range(1):
+    for i in range(len(bal)) :
         #風船に移動
         acc.move(bal[i])
 
