@@ -89,7 +89,7 @@ class AccTello:
 
     def startGame(self):
         #ゲーム開始
-        self.savePic(1)   #開始時間撮影
+        #self.savePic(1)   #開始時間撮影
         self.tello.takeoff()   #離陸
         self.zVal = self.tello.get_height()    #現在位置（高さ）に高度設定
         print('高さ = {}cm'.format(self.tello.get_height()))
@@ -247,18 +247,12 @@ class AccTello:
         else:
             self.tello.rotate_clockwise(360 - self.aVal)
         self.aVal = 0 # 現在位置（角度）を設定
-    def conf_card(self, bal, took_photo_no):
+
+    def conf_card(self):
         # カードを解析して番号を取得
         image = self.frame_read.frame
         count = self.image_analysis(image)
-        # カード番号が撮影済みカード番号の次の番号だったら撮影
-        if count == took_photo_no + 1:
-            self.savePic
-            # リターン（カード番号、撮影済（Bool）
-            ret = (count, True)
-        else:
-            ret = (count, False)
-        return ret
+        ret = count
 
     def endGame(self):
         # ゲーム終了
@@ -267,7 +261,7 @@ class AccTello:
 
         self.zVal = self.tello.get_height()    # 現在位置（高さ）に高度設定
         print('高さ = {}cm'.format(self.tello.get_height()))
-        self.savePic(6)   # 終了時間撮影
+        #self.savePic(6)   # 終了時間撮影
 
         # 終了処理
         self.tello.set_video_direction(Tello.CAMERA_DOWNWARD)
@@ -279,7 +273,7 @@ class AccTello:
         # 画像保存
         for i in range(PIC_CNT):
             dt = datetime.datetime.now()
-            fn = '{}_{}{}{}{}.png'.format(no,dt.hour,dt.minute,dt.second,dt.microsecond)
+            fn = '{}_{}{}{}{}_{}.png'.format(no,dt.hour,dt.minute,dt.second,dt.microsecond,no)
             cv2.imwrite(fn, self.frame_read.frame) #画像保存
             time.sleep(PIC_INT) #指定秒数待機
 
