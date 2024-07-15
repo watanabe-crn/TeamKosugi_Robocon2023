@@ -228,8 +228,8 @@ class AccTello:
 
     def conf_card(self):
         # カードを解析して番号を取得
-        image = self.frame_read.frame
-        count = self.image_analysis(image)
+        cv2.imwrite('tmp.png', self.frame_read.frame) #画像保存
+        count = self.image_analysis('tmp.png')
         ret = count
 
     def endGame(self):
